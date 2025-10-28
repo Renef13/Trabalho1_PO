@@ -11,7 +11,7 @@ nutrition_values = {'feijao': [5, 20, 10]}
 
 model.x = Var(foods, domain=float)
 
-model.obj = Objective(expr=sum(costs[i] * model.x[foods[i]] for i in range(len(foods))), sense='min')
+model.obj = Objective(expr=sum(costs[i] * model.x[foods[i]] for i in range(len(foods))), sense='minimize')
 
 
 def nutrient_constraints(model, nutrient):

@@ -10,7 +10,7 @@ capacity = 3.0  # Capacidade da mochila
 
 model.x = Var(items, domain=Binary)
 
-model.obj = Objective(expr=sum(values[i] * model.x[items[i]] for i in range(len(items))), sense='max')
+model.obj = Objective(expr=sum(values[i] * model.x[items[i]] for i in range(len(items))), sense='maximize')
 
 model.capacity_constraint = Constraint(expr=sum(weights[i] * model.x[items[i]] for i in range(len(items))) <= capacity)
 
