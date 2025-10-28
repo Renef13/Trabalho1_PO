@@ -1,4 +1,4 @@
-from pyomo.environ import ConcreteModel, Var, Objective, Constraint, SolverFactory
+from pyomo.environ import ConcreteModel, Var, Objective, Constraint, SolverFactory, NonNegativeReals, minimize
 import pandas as pd
 
 model = ConcreteModel()
@@ -9,9 +9,9 @@ nutrients = ['proteina', 'carboidrato', 'vitamina']
 requirements = {'proteina': 50, 'carboidrato': 80, 'vitamina': 20}
 nutrition_values = {'feijao': [5, 20, 10]}
 
-model.x = Var(foods, domain=float)
+model.x = Var(foods, within=NonNegativeReals)
 
-model.obj = Objective(expr=sum(costs[i] * model.x[foods[i]] for i in range(len(foods))), sense='minimize')
+model.obj = Objective(expr=sum(costs[i] * model.x[foods[i]] for i in range(len(foods))), sense=minimize)
 
 
 def nutrient_constraints(model, nutrient):
@@ -22,12 +22,13 @@ def nutrient_constraints(model, nutrient):
 model.nutrient_constraints = Constraint(nutrients, rule=nutrient_constraints)
 
 solver = SolverFactory('glpk')
-solver.solve(model)
+results = solver.solve(model)
 
-results = pd.DataFrame({
+results_df = pd.DataFrame({
     'Alimento': foods,
     'Quantidade (porções)': [model.x[food].value for food in foods]
 })
 
 print("Resultado da Dieta:")
-print(results)
+print(results_df)
+

@@ -3,10 +3,10 @@ import pandas as pd
 
 model = ConcreteModel()
 
-items = ['item1', 'item2', 'item3', 'item4', 'item5']
-values = [5000, 300, 2000, 1500, 50]  # Valores dos itens
-weights = [2.5, 0.8, 0.2, 0.6, 0.4]  # Pesos dos itens
-capacity = 3.0  # Capacidade da mochila
+items = ['Notebook Gamer', 'Câmera DSLR', 'Tablet', 'Fone Bluetooth', 'Livro Técnico', 'Carregador Portátil']
+values = [7500, 4200, 2300, 800, 350, 600]   # Valores (R$)
+weights = [2.8, 1.9, 0.7, 0.3, 1.2, 0.4]     # Pesos (kg)
+capacity = 5.0                               # Capacidade da mochila (kg)
 
 model.x = Var(items, domain=Binary)
 
@@ -28,3 +28,7 @@ results = pd.DataFrame({
 
 print("Resultado da Mochila 0-1:")
 print(results)
+
+
+total_value = sum(values[i] * model.x[items[i]].value for i in range(len(items)))
+print(f"Valor total dos itens selecionados: {total_value} R$")
