@@ -48,7 +48,7 @@ results_df = pd.DataFrame({
 
 total_cost = results_df['Custo Total (R$)'].sum()
 
-print("\nResultado da Dieta (com limites mínimos):")
+print("\nResultado da Dieta:")
 print(results_df)
 print(f"\nCusto total da dieta: R$ {total_cost:.2f}")
 
