@@ -3,10 +3,10 @@ import pandas as pd
 
 model = ConcreteModel()
 
-items = ['Notebook Gamer', 'Câmera DSLR', 'Tablet', 'Fone Bluetooth', 'Livro Técnico', 'Carregador Portátil']
-values = [7500, 4200, 2300, 800, 350, 600]   # Valores (R$)
-weights = [2.8, 1.9, 0.7, 0.3, 1.2, 0.4]     # Pesos (kg)
-capacity = 5.0                               # Capacidade da mochila (kg)
+items = ['Notebook Gamer', 'Câmera DSLR', 'Tablet', 'Fone Bluetooth', 'Livro', 'Carregador Portátil']
+values = [7500, 4200, 2300, 800, 350, 600]
+weights = [2.8, 1.9, 0.7, 0.3, 1.2, 0.4]
+capacity = 5.0
 
 model.x = Var(items, domain=Binary)
 
