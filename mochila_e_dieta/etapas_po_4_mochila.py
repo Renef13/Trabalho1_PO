@@ -13,7 +13,7 @@ class MochilaProblem:
 
     def __init__(self):
         try:
-            self.df_itens = pd.read_csv('data/itens_mochila.csv')
+            self.df_itens = pd.read_csv('../data/itens_mochila.csv')
         except:
             self.criar_dados_backup()
 

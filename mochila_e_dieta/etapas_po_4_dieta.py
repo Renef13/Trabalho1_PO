@@ -13,8 +13,8 @@ class DietaProblem:
 
     def __init__(self):
         try:
-            self.df_alimentos = pd.read_csv('data/alimentos.csv')
-            self.df_restricoes = pd.read_csv('data/restricoes_alimentos.csv')
+            self.df_alimentos = pd.read_csv('../data/alimentos.csv')
+            self.df_restricoes = pd.read_csv('../data/restricoes_alimentos.csv')
         except:
 
             self.criar_dados_backup()
