@@ -1,7 +1,6 @@
 from pyomo.environ import SolverFactory
-from modelo import criar_modelo
 from instancias import INSTANCIAS
-import json
+from modelo import criar_modelo
 
 
 def resolver_instancia(nome_instancia, nome_solver="glpk"):
