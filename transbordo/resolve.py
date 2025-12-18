@@ -4,41 +4,25 @@ from instancias import INSTANCIAS
 
 
 def resolver_instancia(nome_instancia, nome_solver="glpk"):
-    """
-    Resolve uma instância do problema
-
-    Args:
-        nome_instancia (str): "A", "B" ou "C"
-        nome_solver (str): Nome do solver (glpk, gurobi, cplex, ipopt)
-
-    Returns:
-        model: Modelo resolvido
-        results: Resultados da otimização
-    """
-
     print("=" * 70)
     print(f"RESOLVENDO INSTÂNCIA {nome_instancia}")
     print("=" * 70)
 
-    # 1. Obter dados da instância
     if nome_instancia not in INSTANCIAS:
         raise ValueError(f"Instância '{nome_instancia}' não encontrada. Use 'A', 'B' ou 'C'.")
 
     dados = INSTANCIAS[nome_instancia]
 
-    # 2. Criar modelo
     print("\n[1/3] Criando modelo...")
     model = criar_modelo(dados)
     print(f"      ✓ Variáveis: {model.nvariables()}")
     print(f"      ✓ Restrições: {model.nconstraints()}")
 
-    # 3. Declarar solver explicitamente
     print(f"\n[2/3] Configurando solver: {nome_solver.upper()}")
     solver = SolverFactory(nome_solver)
 
-    # Configurações opcionais do solver
     if nome_solver == "glpk":
-        solver.options['tmlim'] = 300  # Limite de tempo: 5 minutos
+        solver.options['tmlim'] = 300
     elif nome_solver == "gurobi":
         solver.options['TimeLimit'] = 300
         solver.options['MIPGap'] = 0.01
@@ -46,11 +30,9 @@ def resolver_instancia(nome_instancia, nome_solver="glpk"):
         solver.options['timelimit'] = 300
         solver.options['mipgap'] = 0.01
 
-    # 4. Resolver
     print(f"\n[3/3] Resolvendo modelo...")
     results = solver.solve(model, tee=True)
 
-    # 5. Verificar status da solução
     print("\n" + "=" * 70)
     print("STATUS DA SOLUÇÃO")
     print("=" * 70)
@@ -67,21 +49,12 @@ def resolver_instancia(nome_instancia, nome_solver="glpk"):
 
 
 def exibir_resultados(model):
-    """
-    Exibe os resultados da otimização de forma organizada
-
-    Args:
-        model: Modelo Pyomo resolvido
-    """
-
     print("\n" + "=" * 70)
     print("RESULTADOS DA OTIMIZAÇÃO")
     print("=" * 70)
 
-    # Custo total
     print(f"\n💰 CUSTO TOTAL: ${model.objetivo():.2f}")
 
-    # Decomposição dos custos
     custo_silos = sum(model.cf_silo[j] * model.z[j]() for j in model.S)
     custo_carrocerias = sum(model.cf_carr * model.t[i, j]() for (i, j) in model.Arcos_FS)
     custo_transporte = sum(model.custo_ferro[j, k] * model.y[j, k]() for (j, k) in model.Arcos_SP)
@@ -90,7 +63,6 @@ def exibir_resultados(model):
     print(f"   • Custo fixo das carrocerias:  ${custo_carrocerias:.2f}")
     print(f"   • Custo de transporte (ferro): ${custo_transporte:.2f}")
 
-    # Silos ativados
     print("\n" + "-" * 70)
     print("🏭 SILOS ATIVADOS")
     print("-" * 70)
@@ -106,7 +78,6 @@ def exibir_resultados(model):
     else:
         print("   Nenhum silo ativado")
 
-    # Portos ativos
     print("\n" + "-" * 70)
     print("🚢 PORTOS ATIVOS")
     print("-" * 70)
@@ -121,7 +92,6 @@ def exibir_resultados(model):
     else:
         print("   Nenhum porto ativado")
 
-    # Fluxos Fazenda → Silo
     print("\n" + "-" * 70)
     print("🚚 FLUXOS FAZENDA → SILO (Treminhões)")
     print("-" * 70)
@@ -135,7 +105,6 @@ def exibir_resultados(model):
     else:
         print("   Nenhum fluxo")
 
-    # Fluxos Silo → Porto
     print("\n" + "-" * 70)
     print("🚂 FLUXOS SILO → PORTO (Ferrovia)")
     print("-" * 70)
@@ -150,7 +119,6 @@ def exibir_resultados(model):
     else:
         print("   Nenhum fluxo")
 
-    # Resumo de produção e demanda
     print("\n" + "-" * 70)
     print("📊 BALANÇO GERAL")
     print("-" * 70)
@@ -169,18 +137,10 @@ def exibir_resultados(model):
 
 
 def main():
-    """
-    Função principal
-    """
-
-    # ===== CONFIGURAÇÃO =====
-    # Escolha a instância: "A", "B" ou "C"
     INSTANCIA = "C"
 
-    # Escolha o solver: "glpk", "gurobi", "cplex", "ipopt"
     SOLVER = "glpk"
 
-    # ===== RESOLUÇÃO =====
     try:
 
         model, results = resolver_instancia(INSTANCIA, SOLVER)
