@@ -47,7 +47,7 @@ class AnalisadorResultados:
         print(f"Produção total: {self.prod_total}t")
         print(f"Capacidade total dos portos: {self.cap_portos}t")
 
-        print("\n📊 Processamento por silo:")
+        print("\n Processamento por silo:")
         for silo in sorted(self.silos_ativos.keys()):
             volume = self.silos_ativos[silo]
             capacidade = self.model.cap_silo[silo]
@@ -57,7 +57,7 @@ class AnalisadorResultados:
 
             print(f"   • {silo}: {volume:.0f}t / {capacidade}t ({status}) - CF: R$ {custo_fixo:.2f}")
 
-        print("\n💡 Análise estrutural:")
+        print("\n Análise estrutural:")
 
         silos_ordenados = sorted(self.silos_ativos.items(), key=lambda x: x[1], reverse=True)
         capacidade_tres_maiores = sum(self.model.cap_silo[s] for s, _ in silos_ordenados[:3])
@@ -71,7 +71,7 @@ class AnalisadorResultados:
         else:
             print(f"   • CONCLUSÃO: Haveria folga para fechar um silo")
 
-        print("\n📝 Justificativas por silo:")
+        print("\n Justificativas por silo:")
         for silo in sorted(self.silos_ativos.keys()):
             volume = self.silos_ativos[silo]
             capacidade = self.model.cap_silo[silo]
@@ -101,9 +101,9 @@ class AnalisadorResultados:
         print(f"SEÇÃO 2: CUSTOS TOTAIS E DECOMPOSIÇÃO - INSTÂNCIA {self.nome}")
         print("=" * 70)
 
-        print(f"\n💰 CUSTO TOTAL: R$ {self.custo_total:,.2f}")
+        print(f"\n CUSTO TOTAL: R$ {self.custo_total:,.2f}")
 
-        print("\n📊 Decomposição por componente:")
+        print("\n Decomposição por componente:")
         print(f"   1. Transporte Fazenda→Silo:  R$ {self.custo_rodoviario:>10,.2f}")
         print(f"   2. Custo fixo dos silos:     R$ {self.custo_silos:>10,.2f}")
         print(f"   3. Transporte Silo→Porto:    R$ {self.custo_ferro:>10,.2f}")
@@ -111,7 +111,7 @@ class AnalisadorResultados:
         print(f"   {'─' * 44}")
         print(f"   TOTAL:                       R$ {self.custo_total:>10,.2f}")
 
-        print("\n📈 Análise percentual (participação no custo total):")
+        print("\n Análise percentual (participação no custo total):")
         print(f"   • Rodoviário:   {(self.custo_rodoviario / self.custo_total) * 100:>6.2f}%")
         print(f"   • Custo fixo:   {(self.custo_silos / self.custo_total) * 100:>6.2f}%")
         print(f"   • Ferroviário:  {(self.custo_ferro / self.custo_total) * 100:>6.2f}%")
@@ -125,7 +125,7 @@ class AnalisadorResultados:
         }
         maior = max(componentes, key=componentes.get)
 
-        print(f"\n💡 Componente dominante: {maior}")
+        print(f"\n Componente dominante: {maior}")
         print(f"   O {maior.lower()} representa a maior parcela do custo,")
         print(f"   concentrando {(componentes[maior] / self.custo_total) * 100:.1f}% do total.")
 
@@ -135,7 +135,7 @@ class AnalisadorResultados:
         print(f"SEÇÃO 3: IMPACTO DOS MODAIS DE TRANSPORTE - INSTÂNCIA {self.nome}")
         print("=" * 70)
 
-        print("\n🚚 MODAL RODOVIÁRIO (Treminhão: Fazenda→Silo)")
+        print("\n MODAL RODOVIÁRIO (Treminhão: Fazenda→Silo)")
         print(f"   • Custo total: R$ {self.custo_rodoviario:,.2f}")
         print(f"   • Volume transportado: {self.prod_total}t")
         print(f"   • Custo unitário: R$ 5,00/t (fixo para todas as rotas)")
@@ -149,10 +149,10 @@ class AnalisadorResultados:
                 rotas_com_3.append(f"{i}→{j}")
 
         if rotas_com_3:
-            print(f"\n   ⚠ Rotas no limite (3 carrocerias): {', '.join(rotas_com_3)}")
+            print(f"\n Rotas no limite (3 carrocerias): {', '.join(rotas_com_3)}")
             print(f"   A restrição operacional está ATIVA nessas rotas")
 
-        print("\n🚂 MODAL FERROVIÁRIO (Silo→Porto)")
+        print("\n MODAL FERROVIÁRIO (Silo→Porto)")
         print(f"   • Custo total: R$ {self.custo_ferro:,.2f}")
         print(f"   • Volume transportado: {self.prod_total}t")
         print(f"   • Custos DIFERENCIADOS por rota")
@@ -165,7 +165,7 @@ class AnalisadorResultados:
             status = "SATURADO" if util >= 99.9 else "COM FOLGA"
             print(f"      • {porto}: {volume:.0f}t / {capacidade}t ({status})")
 
-        print("\n🔍 Comparação modal:")
+        print("\n Comparação modal:")
         print(f"   • O modal FERROVIÁRIO é mais caro em termos absolutos")
         print(f"   • Ferrovia: R$ {self.custo_ferro:,.2f} vs Rodoviário: R$ {self.custo_rodoviario:,.2f}")
         print(f"   • Diferença: R$ {(self.custo_ferro - self.custo_rodoviario):,.2f}")
@@ -178,7 +178,7 @@ class AnalisadorResultados:
         print(f"SEÇÃO 4: GARGALOS LOGÍSTICOS - INSTÂNCIA {self.nome}")
         print("=" * 70)
 
-        print("\n🏭 GARGALO 1: Capacidade dos silos")
+        print("\n GARGALO 1: Capacidade dos silos")
         silos_saturados = []
         for silo, volume in self.silos_ativos.items():
             capacidade = self.model.cap_silo[silo]
@@ -191,10 +191,10 @@ class AnalisadorResultados:
                 print(f"   • {silo}: {folga:.0f}t de folga")
 
         if len(silos_saturados) >= 3:
-            print(f"\n   ⚠ CRÍTICO: {len(silos_saturados)} silos saturados")
+            print(f"\n    CRÍTICO: {len(silos_saturados)} silos saturados")
             print(f"   O sistema opera com pouca folga de capacidade")
 
-        print("\n🚚 GARGALO 2: Restrição de carrocerias")
+        print("\n GARGALO 2: Restrição de carrocerias")
         rotas_limite = []
         for (i, j) in self.model.Arcos_FS:
             carrocerias = int(self.model.t[i, j]())
@@ -289,19 +289,19 @@ def comparar_instancias():
     custo_C = resultados['C'].custo_total
     custo_B = resultados['B'].custo_total
 
-    print(f"\n💰 Ranking de custos:")
-    print(f"   1️⃣ Instância A: R$ {custo_A:,.2f} (MAIS BARATA)")
-    print(f"   2️⃣ Instância C: R$ {custo_C:,.2f} (BASE/REFERÊNCIA)")
-    print(f"   3️⃣ Instância B: R$ {custo_B:,.2f} (MAIS CARA)")
+    print(f"\n Ranking de custos:")
+    print(f"   1️ Instância A: R$ {custo_A:,.2f} (MAIS BARATA)")
+    print(f"   2️ Instância C: R$ {custo_C:,.2f} (BASE/REFERÊNCIA)")
+    print(f"   3️ Instância B: R$ {custo_B:,.2f} (MAIS CARA)")
 
-    print(f"\n📊 Diferenças absolutas e relativas:")
+    print(f"\n Diferenças absolutas e relativas:")
     dif_CA = custo_C - custo_A
     dif_BC = custo_B - custo_C
     print(f"   • C vs A: R$ {dif_CA:,.2f} (+{(dif_CA / custo_A) * 100:.1f}%)")
     print(f"   • B vs C: R$ {dif_BC:,.2f} (+{(dif_BC / custo_C) * 100:.1f}%)")
     print(f"   • B vs A: R$ {(custo_B - custo_A):,.2f} (+{((custo_B - custo_A) / custo_A) * 100:.1f}%)")
 
-    print(f"\n🔍 Número de silos e sensibilidade aos custos fixos:")
+    print(f"\n Número de silos e sensibilidade aos custos fixos:")
     todos_iguais = len(set(len(r.silos_ativos) for r in resultados.values())) == 1
 
     if todos_iguais:
@@ -313,7 +313,7 @@ def comparar_instancias():
         print(f"   • Número de silos varia entre as instâncias")
         print(f"   • Sistema tem folga para fechar silos em alguns cenários")
 
-    print(f"\n📦 Distribuição dos fluxos Silo→Porto:")
+    print(f"\n Distribuição dos fluxos Silo→Porto:")
     # Verificar se os fluxos são idênticos
     fluxos_A = resultados['A'].fluxos_portos
     fluxos_C = resultados['C'].fluxos_portos
@@ -342,7 +342,7 @@ def gerar_relatorio_completo(instancia='C'):
     results = solver.solve(model, tee=False)
 
     if results.solver.termination_condition not in ["optimal", "feasible"]:
-        print(f"❌ Erro ao resolver: {results.solver.termination_condition}")
+        print(f" Erro ao resolver: {results.solver.termination_condition}")
         return
 
     analisador = AnalisadorResultados(model, instancia)

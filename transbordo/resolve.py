@@ -40,7 +40,7 @@ def resolver_instancia(nome_instancia, nome_solver="glpk"):
     if results.solver.termination_condition == "optimal":
         print("✓ Solução ótima encontrada!")
     elif results.solver.termination_condition == "feasible":
-        print("⚠ Solução viável encontrada (pode não ser ótima)")
+        print("Solução viável encontrada (pode não ser ótima)")
     else:
         print(f"✗ Erro: {results.solver.termination_condition}")
         return model, results
@@ -53,34 +53,32 @@ def exibir_resultados(model):
     print("RESULTADOS DA OTIMIZAÇÃO")
     print("=" * 70)
 
-    print(f"\n💰 CUSTO TOTAL: R$ {model.objetivo():.2f}")
+    print(f"\n CUSTO TOTAL: R$ {model.objetivo():.2f}")
 
-    # Cálculo dos custos por componente
+
     custo_silos = sum(model.cf_silo[j] * model.z[j]() for j in model.S)
     custo_carrocerias = sum(model.cf_carr * model.t[i, j]() for (i, j) in model.Arcos_FS)
     custo_transporte = sum(model.custo_ferro[j, k] * model.y[j, k]() for (j, k) in model.Arcos_SP)
 
-    # Custo rodoviário (treminhão) = 5 R$/t * volume total
     volume_rodoviario = sum(model.x[i, j]() for (i, j) in model.Arcos_FS)
-    custo_rodoviario = volume_rodoviario * 5  # 5 R$/t conforme modelo
+    custo_rodoviario = volume_rodoviario * 5
 
-    print(f"\n📊 DECOMPOSIÇÃO DE CUSTOS:")
+    print(f"\n DECOMPOSIÇÃO DE CUSTOS:")
     print(f"   • Transporte Fazenda→Silo (rodoviário): R$ {custo_rodoviario:.2f}")
     print(f"   • Custo fixo dos silos:                 R$ {custo_silos:.2f}")
     print(f"   • Transporte Silo→Porto (ferroviário):  R$ {custo_transporte:.2f}")
     print(f"   • Custo das carrocerias:                R$ {custo_carrocerias:.2f}")
     print(f"   • TOTAL:                                R$ {model.objetivo():.2f}")
 
-    # Análise percentual
     total = model.objetivo()
-    print(f"\n📈 PARTICIPAÇÃO PERCENTUAL:")
+    print(f"\n PARTICIPAÇÃO PERCENTUAL:")
     print(f"   • Rodoviário:    {(custo_rodoviario / total) * 100:.1f}%")
     print(f"   • Custo fixo:    {(custo_silos / total) * 100:.1f}%")
     print(f"   • Ferroviário:   {(custo_transporte / total) * 100:.1f}%")
     print(f"   • Carrocerias:   {(custo_carrocerias / total) * 100:.1f}%")
 
     print("\n" + "-" * 70)
-    print("🏭 SILOS ATIVADOS E UTILIZAÇÃO")
+    print("SILOS ATIVADOS E UTILIZAÇÃO")
     print("-" * 70)
 
     silos_ativos = [j for j in model.S if model.z[j]() > 0.5]
@@ -98,7 +96,7 @@ def exibir_resultados(model):
     print(f"\n   Total de silos ativados: {len(silos_ativos)}")
 
     print("\n" + "-" * 70)
-    print("🚢 PORTOS E ATENDIMENTO")
+    print("PORTOS E ATENDIMENTO")
     print("-" * 70)
 
     portos_ativos = [k for k in model.P if model.w[k]() > 0.5]
@@ -114,7 +112,7 @@ def exibir_resultados(model):
         print("   Nenhum porto ativado")
 
     print("\n" + "-" * 70)
-    print("🚚 FLUXOS FAZENDA → SILO (Treminhões)")
+    print("FLUXOS FAZENDA → SILO (Treminhões)")
     print("-" * 70)
 
     fluxos_fs = [(i, j, model.x[i, j](), model.t[i, j]())
@@ -136,7 +134,7 @@ def exibir_resultados(model):
         print("   Nenhum fluxo")
 
     print("\n" + "-" * 70)
-    print("🚂 FLUXOS SILO → PORTO (Ferrovia)")
+    print("FLUXOS SILO → PORTO (Ferrovia)")
     print("-" * 70)
 
     fluxos_sp = [(j, k, model.y[j, k](), model.custo_ferro[j, k])
@@ -150,7 +148,7 @@ def exibir_resultados(model):
         print("   Nenhum fluxo")
 
     print("\n" + "-" * 70)
-    print("📊 BALANÇO GERAL")
+    print(" BALANÇO GERAL")
     print("-" * 70)
 
     prod_total = sum(model.prod[i] for i in model.F)
@@ -164,18 +162,18 @@ def exibir_resultados(model):
 
     if enviado_total < dem_total:
         deficit = dem_total - enviado_total
-        print(f"   ⚠ Déficit: {deficit:.0f}t (produção insuficiente)")
+        print(f"    Déficit: {deficit:.0f}t (produção insuficiente)")
 
 
 def analise_comparativa_instancias():
-    """Resolve todas as instâncias e faz análise comparativa"""
+
     print("\n" + "=" * 70)
     print("ANÁLISE COMPARATIVA DAS TRÊS INSTÂNCIAS")
     print("=" * 70)
 
     resultados = {}
 
-    for inst in ['A', 'C', 'B']:  # Ordem: mais barata → base → mais cara
+    for inst in ['A', 'C', 'B']:
         model, results = resolver_instancia(inst, "glpk")
 
         if results.solver.termination_condition in ["optimal", "feasible"]:
@@ -187,7 +185,7 @@ def analise_comparativa_instancias():
 
             silos_ativos = len([j for j in model.S if model.z[j]() > 0.5])
 
-            # Porto mais atendido
+
             fluxos_portos = {}
             for k in model.P:
                 fluxos_portos[k] = sum(model.y[j, k]() for j in model.S)
@@ -205,7 +203,7 @@ def analise_comparativa_instancias():
                 'porto_min': (porto_min, fluxos_portos[porto_min])
             }
 
-    # Tabela comparativa
+
     print("\n" + "=" * 70)
     print("TABELA COMPARATIVA")
     print("=" * 70)
@@ -216,7 +214,7 @@ def analise_comparativa_instancias():
         if inst not in resultados:
             continue
 
-    # Custos
+
     print(f"{'Custo total (R$)':<40} ", end="")
     for inst in ['A', 'C', 'B']:
         print(f"R$ {resultados[inst]['custo_total']:>10,.2f}  ", end="")
@@ -263,7 +261,7 @@ def analise_comparativa_instancias():
     print("ANÁLISE QUALITATIVA")
     print("=" * 70)
 
-    print(f"\n🔍 Comparação relativa:")
+    print(f"\n Comparação relativa:")
     print(f"   • Instância A (custo fixo BAIXO):  R$ {resultados['A']['custo_total']:,.2f} - MAIS BARATA")
     print(f"   • Instância C (custo fixo BASE):   R$ {resultados['C']['custo_total']:,.2f} - REFERÊNCIA")
     print(f"   • Instância B (custo fixo ALTO):   R$ {resultados['B']['custo_total']:,.2f} - MAIS CARA")
@@ -274,7 +272,7 @@ def analise_comparativa_instancias():
     print(f"\n   Diferença C vs A: R$ {dif_AC:,.2f} (+{(dif_AC / resultados['A']['custo_total']) * 100:.1f}%)")
     print(f"   Diferença B vs C: R$ {dif_BC:,.2f} (+{(dif_BC / resultados['C']['custo_total']) * 100:.1f}%)")
 
-    print(f"\n💡 Observações:")
+    print(f"\n Observações:")
     print(f"   • Todos os cenários ativam {resultados['A']['silos_ativos']} silos (decisão estrutural)")
     print(f"   • Fluxos ferroviários são idênticos nas três instâncias")
     print(f"   • O componente ferroviário domina o custo total em todas as instâncias")
@@ -309,7 +307,7 @@ def main():
                 exibir_resultados(model)
 
         except Exception as e:
-            print(f"\n❌ ERRO: {e}")
+            print(f"\n ERRO: {e}")
             import traceback
             traceback.print_exc()
 
@@ -317,7 +315,7 @@ def main():
         try:
             analise_comparativa_instancias()
         except Exception as e:
-            print(f"\n❌ ERRO: {e}")
+            print(f"\n ERRO: {e}")
             import traceback
             traceback.print_exc()
 

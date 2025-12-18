@@ -1,9 +1,11 @@
+
 from msilib import Binary
 
 from pyomo.environ import *
 
 
 def criar_modelo(dados):
+
     model = ConcreteModel(name="Transbordo_Bacuri")
 
     model.F = Set(initialize=dados["prod"].keys(), doc="Fazendas")
@@ -13,8 +15,8 @@ def criar_modelo(dados):
     model.Arcos_FS = Set(initialize=model.F * model.S, doc="Arcos Fazenda-Silo")
     model.Arcos_SP = Set(initialize=model.S * model.P, doc="Arcos Silo-Porto")
 
-    model.prod = Param(model.F, initialize=dados["prod"], doc="Produção das fazendas (t)")
 
+    model.prod = Param(model.F, initialize=dados["prod"], doc="Produção das fazendas (t)")
     model.dem = Param(model.P, initialize=dados["dem"], doc="Demanda dos portos (t)")
 
     model.cap_silo = Param(model.S, initialize=dados["cap_silo"], doc="Capacidade dos silos (t)")
@@ -35,14 +37,17 @@ def criar_modelo(dados):
     model.z = Var(model.S, within=Binary, doc="Ativação do silo (0/1)")
     model.w = Var(model.P, within=Binary, doc="Ativação do porto (0/1)")
 
-    model.t = Var(model.Arcos_FS, within=NonNegativeIntegers, bounds=(0, 3), doc="Número de carrocerias (0-3)")
+    model.t = Var(model.Arcos_FS, within=NonNegativeIntegers, bounds=(0, 3),
+                  doc="Número de carrocerias (0-3)")
+
 
     def objetivo_rule(m):
+
         custo_silos = sum(m.cf_silo[j] * m.z[j] for j in m.S)
         custo_carrocerias = sum(m.cf_carr * m.t[i, j] for (i, j) in m.Arcos_FS)
-        custo_transporte = sum(m.custo_ferro[j, k] * m.y[j, k] for (j, k) in m.Arcos_SP)
+        custo_ferroviario = sum(m.custo_ferro[j, k] * m.y[j, k] for (j, k) in m.Arcos_SP)
 
-        return custo_silos + custo_carrocerias + custo_transporte
+        return custo_silos + custo_carrocerias + custo_ferroviario
 
     model.objetivo = Objective(rule=objetivo_rule, sense=minimize, doc="Minimizar custo total")
 
