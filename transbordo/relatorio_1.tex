@@ -1,0 +1,790 @@
+\documentclass[12pt,a4paper]{article}
+
+\usepackage[brazil]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{setspace}
+\usepackage{geometry}
+\usepackage{amsmath, amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{multirow}
+
+\geometry{
+    left=3cm,
+    right=2cm,
+    top=3cm,
+    bottom=2cm
+}
+
+\onehalfspacing
+
+\begin{document}
+
+\begin{center}
+    \textbf{UNIVERSIDADE FEDERAL DO MARANHÃO} \\
+    \textbf{CENTRO DE CIÊNCIAS EXATAS E TECNOLOGIA} \\[3cm]
+
+    \textbf{DISCIPLINA:} Pesquisa Operacional \\
+    \textbf{DOCENTE:} Alexandre Cesar Muniz de Oliveira \\
+    \textbf{DISCENTE:} Renef Ricardo Costa da Silva \\[4cm]
+
+    \textbf{\Large A Jornada dos Bacuris} \\[0.5cm]
+    \textbf{Trabalho de Pesquisa Operacional} \\[4cm]
+
+    São Luís -- MA \\
+    2025
+\end{center}
+
+\newpage
+
+\section{Introdução}
+
+A otimização de sistemas logísticos com múltiplos estágios de transporte e armazenagem é
+fundamental para a viabilidade econômica de cadeias produtivas complexas. Quando decisões
+sobre a ativação de instalações intermediárias estão envolvidas, o problema assume caráter
+estratégico e pode ser adequadamente modelado por meio da Programação Inteira Mista (MIP).
+
+O presente trabalho aborda o Problema de Transbordo com Custos Fixos aplicado à cadeia
+logística da produção de bacuri no Norte do Brasil. Este problema combina variáveis contínuas,
+associadas aos fluxos de produto, e variáveis discretas, relacionadas à abertura de silos e à
+quantidade de veículos utilizados, caracterizando um modelo de Programação Inteira Mista
+capaz de determinar simultaneamente rotas de transporte, pontos de transbordo ativos e os
+recursos logísticos necessários.
+
+A relevância deste estudo estende-se além do caso específico do bacuri, oferecendo uma
+metodologia aplicável a diversas cadeias agroindustriais que operam sob limitações de
+infraestrutura e demandam soluções de transporte multimodal eficientes.
+
+\section{Contextualização do Problema}
+
+\subsection{O Sistema Logístico}
+
+A cadeia logística da produção de bacuri envolve múltiplas etapas de transporte, decorrentes
+das grandes distâncias entre as áreas de produção e os centros exportadores. O fluxo logístico
+pode ser descrito da seguinte forma:
+
+\begin{itemize}
+    \item \textbf{Fazendas $\rightarrow$ Silos:} A produção é transportada por treminhões,
+    caminhões com até três carrocerias articuladas, capazes de operar em vias não pavimentadas,
+    ligando as fazendas aos silos de transbordo.
+
+    \item \textbf{Silos (Transbordo):} Instalações temporárias que armazenam os frutos por até
+    72 horas. A utilização de cada silo é opcional e condicionada ao pagamento de um custo fixo
+    de ativação.
+
+    \item \textbf{Silos $\rightarrow$ Terminal Ferroviário:} O transporte de longa distância é
+    realizado por locomotivas, com custo proporcional à quantidade transportada.
+
+    \item \textbf{Terminal $\rightarrow$ Porto:} A carga é embarcada em navios cargueiros para
+    exportação aos mercados internacionais.
+\end{itemize}
+
+\subsection{Características do Problema}
+
+O problema logístico analisado apresenta as seguintes características principais:
+
+\begin{itemize}
+    \item Múltiplos nós na rede, incluindo fazendas (origens), silos (nós intermediários),
+    terminais ferroviários e porto (destino final);
+    \item Utilização de múltiplos modais de transporte, como treminhões, trem e navio;
+    \item Presença de custos fixos, associados à ativação dos silos e ao uso de carrocerias de
+    treminhão;
+    \item Capacidades limitadas nos silos e nos veículos de transporte;
+    \item Necessidade de conservação de fluxo nos nós intermediários.
+\end{itemize}
+
+\subsection{Justificativa do Uso de Silos}
+
+A utilização de silos de transbordo é essencial para a eficiência da cadeia logística, pois
+permite a consolidação de cargas provenientes de múltiplas fazendas, viabiliza a integração
+entre modais de transporte incompatíveis (treminhão e ferrovia), oferece flexibilidade
+temporal para o escoamento da produção e contribui para a redução de custos quando
+comparada ao transporte direto das fazendas até os centros exportadores.
+
+\section{Objetivos}
+
+\subsection{Objetivo Geral}
+
+Desenvolver um modelo de Programação Inteira Mista que minimize o custo total da operação
+logística, determinando simultaneamente os fluxos de produto, a ativação de silos de
+transbordo e a quantidade de carrocerias de treminhão utilizadas.
+
+\subsection{Objetivos Específicos}
+
+Os objetivos específicos deste trabalho são:
+
+\begin{itemize}
+    \item Mapear o sistema logístico completo, identificando nós, arcos, capacidades e custos;
+    \item Formular matematicamente o problema, definindo conjuntos, parâmetros, variáveis de
+    decisão, função objetivo e restrições;
+    \item Implementar computacionalmente o modelo de otimização;
+    \item Criar e resolver três instâncias distintas:
+    \begin{itemize}
+        \item Instância A: baixo custo fixo de ativação dos silos;
+        \item Instância B: alto custo fixo de ativação dos silos;
+        \item Instância C: configuração de referência fornecida.
+    \end{itemize}
+    \item Analisar comparativamente os resultados obtidos, considerando silos ativados,
+    custos totais e possíveis gargalos logísticos;
+    \item Discutir a aplicabilidade prática do modelo, bem como suas limitações e possíveis
+    extensões.
+\end{itemize}
+
+\section{Descrição Textual do Sistema Logístico}
+
+\subsection{Nós da Rede}
+
+A rede logística considerada é composta por três tipos de nós:
+
+\textbf{Origens (Fazendas):}
+\begin{itemize}
+    \item $F1, F2, F3, F4, F5$: fazendas produtoras de bacuri, cada uma com capacidade de produção conhecida.
+\end{itemize}
+
+\textbf{Nós Intermediários (Silos de Transbordo):}
+\begin{itemize}
+    \item $S1, S2, S3, S4$: instalações temporárias de transbordo que podem ser ativadas ou não mediante o pagamento de um custo fixo.
+\end{itemize}
+
+\textbf{Destinos (Terminais Portuários):}
+\begin{itemize}
+    \item $P1, P2, P3$: portos exportadores que possuem demandas mínimas a serem atendidas.
+\end{itemize}
+
+\subsection{Arcos e Modais de Transporte}
+
+\textbf{Fazenda $\rightarrow$ Silo (Modal: Treminhão)}
+\begin{itemize}
+    \item Arcos: $(F_i, S_j)$, para todo $i \in \{1,\dots,5\}$ e $j \in \{1,\dots,4\}$;
+    \item Veículos: treminhões com configuração flexível de 1 a 3 carrocerias;
+    \item Capacidade: 30 toneladas por carroceria;
+    \item Custo: \$20 por carroceria utilizada (custo fixo) + \$5 por tonelada transportada.
+\end{itemize}
+
+\textbf{Silo $\rightarrow$ Porto (Modal: Ferroviário)}
+\begin{itemize}
+    \item Arcos: $(S_j, P_k)$, para todo $j \in \{1,\dots,4\}$ e $k \in \{1,\dots,3\}$;
+    \item Custo: proporcional à quantidade transportada (em \$/tonelada), variando conforme a rota.
+\end{itemize}
+
+\subsection{Capacidades e Limites}
+
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline
+\textbf{Elemento} & \textbf{Capacidade/Limite} & \textbf{Unidade} \\
+\hline
+Carroceria de treminhão & 30 & toneladas \\
+Carrocerias por treminhão & 1 a 3 & unidades \\
+Silo $S1$ & 130 & toneladas \\
+Silo $S2$ & 120 & toneladas \\
+Silo $S3$ & 140 & toneladas \\
+Silo $S4$ & 160 & toneladas \\
+\hline
+\end{tabular}
+\end{center}
+
+\subsection{Justificativa Operacional}
+
+A utilização dos silos de transbordo é justificada pelos seguintes fatores:
+\begin{itemize}
+    \item Consolidação de cargas provenientes de múltiplas fazendas;
+    \item Interface entre modais de transporte distintos, como o rodoviário (treminhão) e o ferroviário;
+    \item Possibilidade de armazenagem temporária por até 72 horas, permitindo a sincronização logística.
+\end{itemize}
+
+A flexibilidade no uso de carrocerias possibilita:
+\begin{itemize}
+    \item Adequação da capacidade de transporte à quantidade produzida;
+    \item Um trade-off entre custo fixo e capacidade efetivamente utilizada;
+    \item Decisões operacionais sobre o número de carrocerias empregadas em cada rota Fazenda $\rightarrow$ Silo.
+\end{itemize}
+
+\section{Modelagem Matemática}
+
+Esta seção apresenta a formulação matemática do Problema de Transbordo com Custos Fixos
+aplicado à cadeia logística da produção de bacuri. O modelo é formulado como um problema
+de Programação Inteira Mista (MIP), combinando variáveis contínuas, inteiras e binárias.
+
+\subsection{Conjuntos e Índices}
+
+\begin{itemize}
+    \item $F = \{F1, F2, F3, F4, F5\}$: conjunto das fazendas produtoras;
+    \item $S = \{S1, S2, S3, S4\}$: conjunto dos silos de transbordo;
+    \item $P = \{P1, P2, P3\}$: conjunto dos portos exportadores;
+    \item $i \in F$: índice das fazendas;
+    \item $j \in S$: índice dos silos;
+    \item $k \in P$: índice dos portos.
+\end{itemize}
+
+\subsection{Parâmetros}
+
+\textbf{Produção e Demanda}
+
+\begin{itemize}
+    \item $\text{prod}_i$: produção disponível na fazenda $i$ (toneladas);
+    \item $\text{dem}_k$: carga mínima economicamente viável para operação do porto $k$ (toneladas).
+\end{itemize}
+
+\[
+\text{prod} = \{120, 80, 95, 110, 130\}
+\quad
+\text{dem} = \{200, 220, 215\}
+\]
+
+\textbf{Capacidades}
+
+\begin{itemize}
+    \item $\text{cap}_j$: capacidade máxima do silo $j$ (toneladas);
+    \item $\text{cap\_carr} = 30$: capacidade de uma carroceria de treminhão (toneladas).
+\end{itemize}
+
+\[
+\text{cap} = \{130, 120, 140, 160\}
+\]
+
+\textbf{Custos}
+
+\begin{itemize}
+    \item $\text{cf\_silo}_j$: custo fixo de ativação do silo $j$;
+    \item $\text{cf\_carr} = 20$: custo fixo por carroceria de treminhão utilizada;
+    \item $c_{jk}$: custo de transporte ferroviário do silo $j$ ao porto $k$ (\$/tonelada).
+\end{itemize}
+
+\subsection{Variáveis de Decisão}
+
+\textbf{Variáveis Contínuas (Fluxos)}
+
+\begin{itemize}
+    \item $x_{ij} \geq 0$: quantidade transportada da fazenda $i$ ao silo $j$ (toneladas);
+    \item $y_{jk} \geq 0$: quantidade transportada do silo $j$ ao porto $k$ (toneladas).
+\end{itemize}
+
+\textbf{Variáveis Binárias}
+
+\begin{itemize}
+    \item $z_j \in \{0,1\}$: indica se o silo $j$ é ativado;
+    \item $w_k \in \{0,1\}$: indica se o porto $k$ é ativado e opera.
+\end{itemize}
+
+\[
+w_k =
+\begin{cases}
+1, & \text{se o porto } k \text{ opera (recebe carga)} \\
+0, & \text{caso contrário}
+\end{cases}
+\]
+
+\textbf{Variáveis Inteiras}
+
+\[
+t_{ij} \in \{0,1,2,3\}: \text{número de carrocerias utilizadas no transporte da fazenda } i \text{ ao silo } j
+\]
+
+\subsection{Função Objetivo}
+
+O objetivo do modelo é minimizar o custo total da operação logística, composto pelos custos
+fixos de ativação dos silos, custos fixos das carrocerias de treminhão e custos variáveis de
+transporte ferroviário.
+
+\[
+\min Z =
+\sum_{j \in S} \text{cf\_silo}_j \cdot z_j
++
+\sum_{i \in F} \sum_{j \in S} \text{cf\_carr} \cdot t_{ij}
++
+\sum_{j \in S} \sum_{k \in P} c_{jk} \cdot y_{jk}
+\]
+
+\subsection{Restrições}
+
+\textbf{R1. Conservação de Fluxo nas Fazendas}
+
+Toda a produção disponível em cada fazenda deve ser enviada aos silos.
+
+\[
+\sum_{j \in S} x_{ij} = \text{prod}_i
+\quad \forall i \in F
+\]
+
+\textbf{R2. Conservação de Fluxo nos Silos}
+
+Não há armazenamento permanente nos silos; todo o fluxo que entra deve sair.
+
+\[
+\sum_{i \in F} x_{ij} = \sum_{k \in P} y_{jk}
+\quad \forall j \in S
+\]
+
+\textbf{R3. Ativação Condicional dos Portos}
+
+Um porto só opera caso receba ao menos a carga mínima necessária para viabilizar a exportação.
+
+\[
+\text{dem}_k \cdot w_k
+\leq
+\sum_{j \in S} y_{jk}
+\leq
+M \cdot w_k
+\quad \forall k \in P
+\]
+
+onde $M$ é uma constante suficientemente grande, definida como a soma total da produção das
+fazendas.
+
+\textbf{R4. Capacidade dos Silos}
+
+O envio de produto a um silo só é permitido se ele estiver ativado, respeitando sua capacidade máxima.
+
+\[
+\sum_{i \in F} x_{ij}
+\leq
+\text{cap}_j \cdot z_j
+\quad \forall j \in S
+\]
+
+\textbf{R5. Capacidade das Carrocerias}
+
+A quantidade transportada da fazenda ao silo não pode exceder a capacidade total das carrocerias utilizadas.
+
+\[
+x_{ij}
+\leq
+\text{cap\_carr} \cdot t_{ij}
+\quad \forall i \in F, \ j \in S
+\]
+
+\textbf{R6. Domínio das Variáveis}
+
+\[
+\begin{aligned}
+x_{ij} &\geq 0 && \forall i \in F,\ j \in S \\
+y_{jk} &\geq 0 && \forall j \in S,\ k \in P \\
+z_j &\in \{0,1\} && \forall j \in S \\
+w_k &\in \{0,1\} && \forall k \in P \\
+t_{ij} &\in \{0,1,2,3\} && \forall i \in F,\ j \in S
+\end{aligned}
+\]
+
+\subsection{Observações sobre o Modelo}
+
+O modelo proposto incorpora decisões estratégicas e operacionais de forma integrada. A
+restrição R3 introduz a ativação condicional dos portos, representando a necessidade de
+formação de lotes mínimos economicamente viáveis para exportação. Caso essa condição não
+seja atendida, o porto permanece inativo e não recebe fluxo.
+
+A restrição R4 implementa um mecanismo do tipo \textit{big-M}, garantindo que silos não
+ativados não recebam produto. A restrição R5 estabelece o vínculo entre a capacidade física
+de transporte e o número de carrocerias utilizadas, criando um trade-off entre custo fixo e
+viabilidade logística.
+
+O custo de transporte no trecho Fazenda $\rightarrow$ Silo é considerado com um componente
+fixo, representado pelo uso das carrocerias, e um componente variável de R\$ 5,00 por tonelada
+transportada, enquanto o transporte ferroviário apresenta custo variável proporcional à
+quantidade transportada com tarifas diferenciadas por rota.
+
+\newpage
+
+\section{Resultados e Análise Crítica}
+
+\subsection{Ativação de Silos e Justificativas}
+
+As três instâncias analisadas (A, B e C) utilizam os mesmos dados de produção, capacidades
+e custos de transporte; a única diferença entre elas está no custo fixo de ativação dos silos
+(cenários de custo fixo mais baixo, base e mais alto). Em todos os cenários, o modelo ativou
+os quatro silos (S1, S2, S3 e S4), processando, respectivamente, 115 t, 120 t, 140 t e 160 t.
+
+A escolha por manter todos os silos abertos não é apenas uma preferência econômica, mas uma
+consequência estrutural do sistema. A produção total é 535 t e, se um silo fosse fechado, a
+capacidade somada dos três restantes não seria suficiente para absorver toda a produção dentro
+dos limites individuais de cada silo. Em particular, os três maiores silos (S4, S3 e S1)
+totalizam $160 + 140 + 130 = 420$ t, o que impõe a ativação do quarto silo para viabilizar
+o escoamento completo.
+
+\subsubsection{Justificativas por Silo}
+
+\textbf{S4 (160 t processados):} Aparece em todas as instâncias por ser o silo de maior
+capacidade e opera saturado em todos os cenários. O trade-off associado é que, mesmo com
+custo fixo alto, sua capacidade e participação nas rotas ferroviárias mais econômicas reduzem
+a necessidade de redistribuir carga para rotas mais caras.
+
+\textbf{S3 (140 t processados):} Também é saturado por combinar alta capacidade e custos
+ferroviários atrativos (especialmente para P3 com custo de R\$ 10/t). A presença constante
+indica robustez: mesmo com variação relevante de custo fixo, a estrutura de custos variáveis
+e o gargalo de capacidade fazem com que o silo permaneça indispensável.
+
+\textbf{S2 (120 t processados):} Opera no limite de capacidade, funcionando como complemento
+obrigatório para fechar o balanço de capacidade. Sua ativação não é apenas decisão de custo
+fixo; é necessária para acomodar o volume total sem violar as capacidades dos demais silos.
+
+\textbf{S1 (115 t processados):} Atua como ``amortecedor'' do sistema. Embora não esteja
+saturado (capacidade 130 t), ele é necessário para absorver o restante de produção após o
+preenchimento dos silos mais atrativos/capacitivos, preservando a viabilidade e evitando
+exceder limites operacionais.
+
+\subsection{Custos Totais e Decomposição}
+
+A Tabela \ref{tab:custos} apresenta o custo total em cada instância e a decomposição por componente.
+
+\begin{table}[h]
+\centering
+\caption{Decomposição de custos por instância}
+\label{tab:custos}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Componente (R\$)} & \textbf{Instância A} & \textbf{Instância C} & \textbf{Instância B} \\
+\midrule
+Transporte Fazenda$\rightarrow$Silo & 2.675,00 & 2.675,00 & 2.675,00 \\
+Custo fixo dos silos & 395,00 & 1.950,00 & 3.550,00 \\
+Transporte Silo$\rightarrow$Porto & 8.850,00 & 8.850,00 & 8.850,00 \\
+Custo das carrocerias & 400,00 & 400,00 & 400,00 \\
+\midrule
+\textbf{Custo total} & \textbf{9.645,00} & \textbf{11.200,00} & \textbf{12.800,00} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection{Análise Percentual}
+
+Em todas as instâncias, o transporte ferroviário (Silo$\rightarrow$Porto) é a maior parcela
+do custo total, pois concentra o maior custo variável por tonelada e reflete a matriz
+diferenciada de custos por rota. Na Instância A, a ferrovia representa aproximadamente
+$\frac{8.850}{9.645} \approx 91,8\%$ do custo total, enquanto o custo fixo representa cerca de
+$\frac{395}{9.645} \approx 4,1\%$. Na Instância B, o custo fixo cresce para cerca de
+$\frac{3.550}{12.800} \approx 27,7\%$, reduzindo a participação relativa da ferrovia para
+$\approx 69,1\%$, mesmo sem alteração nas rotas ferroviárias.
+
+O transporte rodoviário (treminhão) representa aproximadamente 27,7\% do custo na Instância A,
+20,9\% na Instância B, mantendo-se constante em valor absoluto (R\$ 2.675,00) devido à
+linearidade do custo unitário de R\$ 5,00/t e à produção total fixa de 535 t.
+
+\subsubsection{Comparação Relativa}
+
+A Instância A é a mais barata porque reduz o componente fixo sem alterar a operação física
+(volumes e saturações) ditada pelas restrições. A Instância C é a referência do cenário base.
+A Instância B é a mais cara: como o sistema já está no limite de capacidade, o aumento dos
+custos fixos não leva ao fechamento de silos (decisão estrutural), sendo absorvido diretamente
+no custo total. A diferença entre a instância mais cara e a mais barata é de R\$ 3.155,00,
+representando um aumento de 32,7\%.
+
+\subsection{Análise Comparativa das Instâncias}
+
+\subsubsection{Número de Silos e Sensibilidade aos Custos Fixos}
+
+O número de silos ativados é o mesmo nas três instâncias (4 silos), evidenciando que a decisão
+de abertura é pouco sensível ao custo fixo no patamar atual, pois existe um gargalo de
+capacidade. Isso produz um comportamento típico de ``efeito limiar'': enquanto o sistema
+estiver próximo ao limite, mudanças no custo fixo mudam o valor ótimo, mas não mudam a
+estrutura (quais silos abrem/fecham).
+
+A Tabela \ref{tab:comparativa} apresenta os principais indicadores comparativos entre as três instâncias.
+
+\begin{table}[h]
+\centering
+\caption{Comparação das três instâncias (indicadores principais)}
+\label{tab:comparativa}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Indicador} & \textbf{Instância A} & \textbf{Instância C} & \textbf{Instância B} \\
+\midrule
+Custo total (R\$) & 9.645,00 & 11.200,00 & 12.800,00 \\
+Silos ativados (quant.) & 4 & 4 & 4 \\
+Custo fixo total (R\$) & 395,00 & 1.950,00 & 3.550,00 \\
+Porto mais atendido (t) & P3 (535) & P3 (535) & P3 (535) \\
+Carrocerias utilizadas & 20 & 20 & 20 \\
+Utilização agregada (\%) & 89,2 & 89,2 & 89,2 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection{Distribuição dos Fluxos e Padrões Observados}
+
+Os fluxos Silo$\rightarrow$Porto são idênticos nas três instâncias, indicando uma solução
+robusta no nível ferroviário. Em todas as instâncias, o porto P3 recebe toda a produção
+(535 t), saturando sua capacidade de 215 t. Este padrão mostra uma priorização econômica
+clara de P3, que apresenta os menores custos ferroviários entre os silos e o destino final.
+
+A matriz de custos ferroviários evidencia que as rotas para P3 são sistematicamente mais
+econômicas:
+\begin{itemize}
+    \item $S4 \rightarrow P3$: R\$ 10/t
+    \item $S3 \rightarrow P3$: R\$ 10/t
+    \item $S2 \rightarrow P3$: R\$ 20/t
+    \item $S1 \rightarrow P3$: R\$ 30/t
+\end{itemize}
+
+Essa estrutura de custos explica por que, mesmo com P3 operando acima de sua capacidade
+nominal de 215 t, o modelo prioriza esse destino, pois os custos marginais de transporte são
+significativamente menores que as alternativas para P1 e P2.
+
+\subsection{Impacto dos Modais de Transporte}
+
+\subsubsection{Treminhão (Fazenda$\rightarrow$Silo)}
+
+O custo total do trecho rodoviário é R\$ 2.675,00 em todas as instâncias, pois a produção
+total é constante e o custo por tonelada no modal rodoviário é linear (R\$ 5,00/t). O número
+total de carrocerias utilizadas é 20, resultando em capacidade contratada total de
+$20 \times 30 = 600$ t. Assim, a utilização média agregada do sistema rodoviário é
+aproximadamente $\frac{535}{600} \approx 89,2\%$, indicando boa consolidação global, mas com
+inevitável ``folga'' por indivisibilidade (variáveis inteiras).
+
+A restrição de no máximo 3 carrocerias por rota limita a concentração de fluxo em uma única
+rota fazenda$\rightarrow$silo e força a distribuição em múltiplas rotas quando necessário.
+Na prática, isso representa limites de frota/viagens e pode aumentar a complexidade
+operacional (mais pontos de carga/descarga e coordenação). Nas soluções obtidas, duas rotas
+operam no limite máximo: $F1 \rightarrow S3$ (90 t com 3 carrocerias) e
+$F5 \rightarrow S4$ (80 t com 3 carrocerias), indicando que a restrição operacional está
+ativa nesses pontos.
+
+\subsubsection{Ferrovia (Silo$\rightarrow$Porto)}
+
+O custo ferroviário total é R\$ 8.850,00 em todas as instâncias e domina o custo global,
+refletindo a matriz de custos diferenciados por rota. O porto P3 é priorizado e saturado,
+comportamento coerente quando se busca minimizar custos de transporte em um sistema com
+custos variáveis diferenciados.
+
+\subsubsection{Comparação Modal}
+
+O modal ferroviário é mais caro em termos absolutos porque concentra a maior parte do custo
+por tonelada e o maior volume agregado, enquanto o modal rodoviário é modelado com custo
+linear uniforme e menor peso total. A diferença entre os custos ferroviário e rodoviário é
+de R\$ 6.175,00, evidenciando que o transporte de longa distância é o principal componente
+de custo do sistema.
+
+\subsection{Gargalos Logísticos Identificados}
+
+\subsubsection{Capacidade dos Silos}
+
+Há saturação de capacidade em três silos: S4 (160/160 t), S3 (140/140 t) e S2 (120/120 t),
+com S1 absorvendo o restante (115/130 t). Isso explica por que todos os silos aparecem em
+todas as instâncias e por que o modelo não consegue reduzir o número de silos abertos: a rede
+opera com pouca folga estrutural.
+
+Esta situação crítica indica que o sistema está operando próximo ao seu limite técnico,
+o que reduz a flexibilidade estratégica e aumenta a vulnerabilidade a variações de demanda
+ou falhas operacionais. Qualquer aumento na produção além das 535 t atuais exigiria
+necessariamente a expansão da capacidade de pelo menos um silo.
+
+\subsubsection{Restrição de Carrocerias}
+
+Existem rotas usando 3 carrocerias (limite operacional), indicando que a restrição
+operacional é ativa e pode criar gargalos locais. Mesmo quando o custo por tonelada é
+linear, a integralidade das carrocerias (0--3) pode forçar fracionamento de fluxos e criar
+pequenas ineficiências por capacidade ociosa. As rotas $F1 \rightarrow S3$ e
+$F5 \rightarrow S4$ operam no limite, o que sugere que eventuais aumentos de produção
+nessas fazendas encontrariam restrições imediatas de transporte.
+
+\subsubsection{Desequilíbrio Oferta/Demanda}
+
+A produção total (535 t) é menor que o somatório dos limites dos portos (635 t). No modelo
+utilizado, os portos operam como limites superiores e não como metas mínimas, o que permite
+distribuir a oferta escassa priorizando os destinos com melhor custo e deixando os portos
+menos atrativos ociosos. Na prática, apenas P3 é utilizado em todas as instâncias, indicando
+uma forte concentração de fluxo em função dos custos ferroviários mais baixos para este
+destino.
+
+\subsubsection{Custos Altos Específicos e Flexibilidade Limitada}
+
+Como a ativação dos silos é binária, o sistema perde flexibilidade estratégica quando está
+no limite de capacidade: aumentos de custo fixo (Instância B) não mudam a estrutura (quais
+silos abrem), apenas encarecem a solução. Esse resultado sugere que melhorias de capacidade
+(expansão de um silo ou aumento de eficiência) podem gerar mais retorno estratégico do que
+apenas renegociar custo fixo, pois devolvem ao modelo a possibilidade real de desligar
+instalações quando economicamente vantajoso.
+
+\section{Conclusão e Relevância do Modelo}
+
+\subsection{Utilidade Prática}
+
+O modelo de Programação Inteira Mista desenvolvido neste trabalho demonstra ser uma
+ferramenta útil e aplicável para o planejamento de operações logísticas multimodais com
+decisões estratégicas integradas. A capacidade de considerar simultaneamente decisões de
+localização (quais silos ativar), alocação (como distribuir fluxos) e dimensionamento
+(quantas carrocerias contratar) confere ao modelo um caráter abrangente que reflete a
+complexidade real de cadeias agroindustriais.
+
+O modelo é útil para planejar escoamento multimodal com decisões estratégicas (ativação de
+silos) e decisões táticas/operacionais (alocação de fluxo e contratação de carrocerias). A
+decomposição de custos mostra claramente onde estão os maiores ``centros de custo'' e permite
+testar cenários de contrato (A, B e C), apoiando o planejamento de orçamento e a negociação
+com fornecedores de serviços logísticos.
+
+A análise dos resultados revela que o componente ferroviário domina o custo total em todas
+as instâncias (variando de 69,1\% a 91,8\% dependendo do cenário), o que aponta
+imediatamente para a necessidade de priorizar a gestão e negociação deste modal. Além disso,
+a identificação de gargalos estruturais (três silos operando no limite de capacidade)
+fornece informações valiosas para decisões de investimento em infraestrutura.
+
+A robustez da solução ferroviária, que permanece idêntica nas três instâncias apesar das
+variações significativas nos custos fixos dos silos (de R\$ 395,00 na Instância A para
+R\$ 3.550,00 na Instância B), indica que as decisões de transporte de longa distância são
+determinadas principalmente pela estrutura de custos variáveis e capacidades, e não pelos
+custos fixos de transbordo. Essa característica confere previsibilidade ao sistema e facilita
+o planejamento de médio e longo prazo.
+
+\subsection{Apoio a Decisões Empresariais}
+
+Com base nos resultados obtidos, um gestor logístico poderia tomar decisões fundamentadas
+em diversas frentes estratégicas e operacionais:
+
+\textbf{Negociação de Contratos de Transporte:} Priorizar a negociação de tarifas e
+contratos ligados ao modal ferroviário, pois ele domina o custo total. Uma redução de
+apenas 10\% nas tarifas ferroviárias resultaria em economia de aproximadamente R\$ 885,00
+por ciclo operacional, valor significativamente superior ao que seria obtido com reduções
+equivalentes em outros componentes. A concentração de fluxo no porto P3 sugere que contratos
+de longo prazo ou parcerias estratégicas com operadores ferroviários nesta rota específica
+poderiam gerar economias substanciais.
+
+\textbf{Investimento em Capacidade:} Avaliar investimento em capacidade de transbordo (por
+exemplo, expansão de um silo) para criar folga operacional e permitir fechamento seletivo
+de silos em cenários de custo fixo alto. A análise revelou que a capacidade combinada dos
+três maiores silos (420 t) é insuficiente para a produção total (535 t), forçando a
+manutenção do quarto silo independentemente do custo fixo. Um aumento de capacidade de
+apenas 115 t em qualquer um dos três maiores silos criaria a possibilidade de desativar
+S1 quando seus custos fixos fossem proibitivos, potencialmente economizando até R\$ 900,00
+na Instância B.
+
+\textbf{Estratégia Comercial de Atendimento:} Rever estratégia comercial de atendimento
+de portos. Com oferta limitada (535 t) e demanda total potencial de 635 t, faz sentido
+priorizar os portos que minimizam custo logístico e usar portos menos atrativos apenas quando
+necessário ou quando oferecerem prêmios comerciais que compensem os custos adicionais de
+transporte. A solução atual, que concentra todo o fluxo em P3, pode não ser a mais adequada
+do ponto de vista comercial se houver diferenciais de preço entre os portos ou penalidades
+por não atendimento de contratos.
+
+\textbf{Gestão de Frota Rodoviária:} Otimizar a utilização de carrocerias, que apresenta
+taxa agregada de 89,2\%. Embora esta seja uma taxa relativamente alta, a identificação de
+rotas operando no limite máximo (3 carrocerias) sugere pontos de atenção para expansão
+futura. A existência de capacidade ociosa de aproximadamente 65 t (600 t contratadas vs
+535 t transportadas) indica oportunidade para redimensionamento da frota ou uso compartilhado
+de recursos em períodos de baixa demanda.
+
+\textbf{Planejamento de Contingência:} Desenvolver planos de contingência para os três
+silos que operam saturados (S2, S3 e S4). Como o sistema está no limite de capacidade,
+qualquer interrupção operacional em um desses silos comprometeria toda a cadeia logística.
+Investimentos em redundância ou em capacidade de armazenagem temporária adicional podem
+ser justificados pela redução de risco operacional.
+
+\textbf{Análise de Sensibilidade para Precificação:} Utilizar o modelo para análises de
+sensibilidade que apoiem decisões de precificação e aceitação de contratos. Por exemplo,
+se um cliente solicitar entrega em P1 ou P2 em vez de P3, o modelo pode quantificar
+rapidamente o custo adicional dessa exigência, permitindo ajustes de preço ou negociação
+de termos contratuais que reflitam os custos logísticos reais.
+
+\subsection{Limitações e Perspectivas Futuras}
+
+Embora o modelo desenvolvido seja robusto e aplicável, algumas limitações devem ser
+reconhecidas, abrindo caminho para extensões e melhorias futuras:
+
+\subsubsection{Limitações do Modelo Atual}
+
+\textbf{Simplificação de Custos Rodoviários:} O modelo assume custo linear do transporte
+rodoviário por tonelada (R\$ 5,00/t), sem diferenciar rotas fazenda$\rightarrow$silo. Na
+realidade, diferentes fazendas podem estar a distâncias variadas dos silos, resultando em
+custos diferenciados. Essa simplificação pode gerar múltiplas soluções equivalentes na
+distribuição das fazendas aos silos, tornando a solução ótima não única do ponto de vista
+prático. Uma matriz de custos ou distâncias específica para cada arco
+fazenda$\rightarrow$silo aumentaria o realismo e a aplicabilidade do modelo.
+
+\textbf{Ausência de Dimensão Temporal:} O modelo não considera explicitamente tempos de
+viagem, janelas de entrega, filas operacionais, ou a dinâmica temporal da chegada de
+produtos aos silos. Em operações reais, a sincronização temporal entre os modais é crucial,
+especialmente considerando o limite de 72 horas de armazenagem nos silos. A incorporação
+de restrições temporais e janelas de operação tornaria o modelo mais aderente à realidade
+operacional.
+
+\textbf{Determinismo dos Parâmetros:} Todos os parâmetros são tratados como valores
+determinísticos conhecidos a priori. Na prática, a produção das fazendas pode variar devido
+a fatores climáticos, fitossanitários ou sazonais; os custos de transporte podem flutuar
+em função do preço de combustíveis; e a disponibilidade de capacidade nos portos pode ser
+afetada por congestionamentos. A ausência de tratamento de incerteza limita a robustez das
+decisões em ambientes voláteis.
+
+\textbf{Critério de Otimização Único:} O modelo considera exclusivamente a minimização de
+custos, não incorporando outros objetivos relevantes como confiabilidade de entrega, tempo
+de trânsito, emissões de carbono, ou distribuição de risco entre fornecedores. Em contextos
+empresariais reais, frequentemente há trade-offs entre múltiplos objetivos que precisam ser
+balanceados.
+
+\textbf{Limitações Operacionais Simplificadas:} Aspectos operacionais como quebras de
+equipamentos, manutenção preventiva, disponibilidade limitada de mão de obra, ou restrições
+regulatórias não são modelados. Da mesma forma, o modelo não captura economias de escala
+ou descontos por volume que poderiam existir nas tarifas de transporte.
+
+\subsubsection{Recomendações para Melhorias Futuras}
+
+Com base nas limitações identificadas, recomenda-se as seguintes extensões para trabalhos
+futuros:
+
+\textbf{Incorporação de Matriz de Custos Diferenciada:} Incluir uma matriz de custos (ou
+distâncias) específica para cada arco fazenda$\rightarrow$silo, capturando a heterogeneidade
+geográfica e econômica das rotas rodoviárias. Isso tornaria as soluções mais realistas e
+únicas, eliminando a ambiguidade na alocação de fazendas a silos.
+
+\textbf{Modelagem sob Incerteza:} Incorporar incerteza paramétrica através de programação
+estocástica ou otimização robusta. Cenários probabilísticos de produção (safra alta/média/
+baixa), custos de transporte (preços de combustível) e disponibilidade de capacidade
+portuária poderiam ser modelados explicitamente. Alternativamente, abordagens de otimização
+robusta poderiam garantir soluções que permaneçam viáveis sob variações paramétricas dentro
+de limites especificados.
+
+\textbf{Modelagem Temporal e Dinâmica:} Estender o modelo para um horizonte de planejamento
+multi-período, incorporando decisões de programação de entregas ao longo do tempo. Isso
+permitiria capturar a dinâmica de chegada de produtos, restrições de janelas temporais,
+e o limite de 72 horas de armazenagem nos silos. Um modelo de programação inteira mista
+dinâmica poderia otimizar não apenas onde, mas também quando realizar cada operação de
+transporte.
+
+\textbf{Metas Mínimas e Penalidades:} Modelar demandas dos portos como metas mínimas com
+penalidades por não atendimento quando a demanda for obrigatória ou contratual. Isso
+refletiria melhor situações em que há compromissos comerciais firmes que devem ser
+respeitados, mesmo que a um custo adicional. A formulação poderia incluir variáveis de
+escassez com custos de penalidade associados.
+
+\textbf{Otimização Multiobjetivo:} Desenvolver uma versão multiobjetivo do modelo que
+considere simultaneamente minimização de custos, minimização de tempo de trânsito,
+minimização de emissões de carbono, e maximização de confiabilidade. Técnicas como programação
+por metas, método do $\varepsilon$-restrito, ou algoritmos evolutivos multiobjetivo poderiam
+gerar um conjunto de soluções Pareto-ótimas, permitindo ao gestor escolher o melhor
+trade-off conforme as prioridades estratégicas da organização.
+
+\textbf{Expansão para Rede Completa:} Estender o modelo para incluir explicitamente o trecho
+terminal ferroviário$\rightarrow$porto, atualmente considerado de forma implícita. Isso
+permitiria analisar decisões sobre transbordo em terminais ferroviários e eventuais
+consolidações antes do embarque nos navios.
+
+\textbf{Integração com Sistemas de Informação:} Desenvolver interfaces de integração com
+sistemas ERP, TMS (Transportation Management Systems) e sistemas de rastreamento em tempo
+real. A parametrização automática do modelo a partir de dados operacionais atualizados
+permitiria seu uso regular como ferramenta de apoio à decisão, não apenas como estudo
+pontual.
+
+\subsection{Considerações Finais}
+
+O presente trabalho demonstrou que a Programação Inteira Mista é uma abordagem adequada e
+eficaz para o planejamento logístico integrado de cadeias agroindustriais multimodais. O
+modelo desenvolvido para o problema de transbordo de bacuri captura as principais decisões
+estratégicas, táticas e operacionais do sistema, fornecendo soluções ótimas que minimizam
+custos totais enquanto respeitam todas as restrições físicas e operacionais.
+
+A análise comparativa das três instâncias revelou insights importantes sobre a estrutura
+do problema, particularmente o papel crítico dos gargalos de capacidade na determinação da
+configuração ótima de silos e a dominância dos custos ferroviários na composição do custo
+total. Esses resultados têm implicações diretas para decisões empresariais, desde a
+priorização de negociações contratuais até investimentos em expansão de capacidade.
+
+As limitações identificadas e as extensões propostas não diminuem o valor do modelo atual,
+mas apontam caminhos promissores para o desenvolvimento de ferramentas ainda mais completas
+e aderentes à complexidade operacional real. A metodologia apresentada é suficientemente
+flexível para acomodar essas extensões, constituindo uma base sólida para trabalhos futuros
+em otimização de cadeias logísticas agroindustriais.
+
+Por fim, cabe ressaltar que, além do caso específico do bacuri, a estrutura metodológica
+aqui desenvolvida é aplicável a uma ampla gama de problemas logísticos que envolvam
+transbordo multimodal, decisões de localização, e gestão integrada de fluxos em redes. Dessa
+forma, o trabalho contribui não apenas para a otimização de uma cadeia específica, mas
+também para o corpo de conhecimento em pesquisa operacional aplicada à logística
+agroindustrial.
+
+\end{document}
